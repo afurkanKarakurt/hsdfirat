@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Yetkilendirme Paneli | CTF 2026</title>
+    <style>
+        :root {
+            --primary-neon: #00ff80;
+            --error-red: #ff4d4d;
+            --bg-dark: #0a0b10;
+            --card-bg: #161b22;
+            --text-gray: #8b949e;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            /* Arka plan için ince bir grid deseni */
+            background-image: linear-gradient(rgba(0, 255, 128, 0.05) 1px, transparent 1px),
+                              linear-gradient(90px, rgba(0, 255, 128, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            border: 1px solid #30363d;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 350px;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: var(--primary-neon);
+            box-shadow: 0 0 20px rgba(0, 255, 128, 0.2);
+        }
+
+        .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        .status-guest {
+            background-color: rgba(255, 77, 77, 0.1);
+            color: var(--error-red);
+            border: 1px solid var(--error-red);
+        }
+
+        .status-admin {
+            background-color: rgba(0, 255, 128, 0.1);
+            color: var(--primary-neon);
+            border: 1px solid var(--primary-neon);
+            box-shadow: 0 0 10px var(--primary-neon);
+        }
+
+        p {
+            color: var(--text-gray);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        #flag-output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #0d1117;
+            border: 1px dashed var(--primary-neon);
+            color: var(--primary-neon);
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            display: none; /* Varsayılan gizli */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="panel">
+        <span class="icon" id="lock-icon">🔒</span>
+        <h1>Erişim Kontrolü</h1>
+        
+        <div id="badge" class="status-badge status-guest">YETKİ: GUEST</div>
+        
+        <p id="message">Üzgünüz, sistem içeriğini görüntülemek için <b>admin</b> yetkisine sahip olmanız gerekmektedir.</p>
+
+        <div id="flag-output">
+            FLAG{IAMTHEBEST}
+        </div>
+    </div>
+
+    <script>
+        function checkAccess() {
+            // Çerezi oku
+            const getCookie = (name) => {
+                let value = "; " + document.cookie;
+                let parts = value.split("; " + name + "=");
+                if (parts.length === 2) return parts.pop().split(";").shift();
+            }
+
+            // Eğer çerez yoksa 'guest' olarak oluştur
+            if (!document.cookie.includes("user_role")) {
+                document.cookie = "user_role=guest; path=/";
+            }
+
+            const role = getCookie("user_role");
+            const badge = document.getElementById("badge");
+            const message = document.getElementById("message");
+            const flagBox = document.getElementById("flag-output");
+            const icon = document.getElementById("lock-icon");
+
+            if (role === "admin") {
+                badge.className = "status-badge status-admin";
+                badge.innerText = "YETKİ: ADMIN";
+                message.innerHTML = "Sisteme başarıyla sızdınız. Gizli veri aşağıdadır:";
+                flagBox.style.display = "block";
+                icon.innerText = "🔓";
+            }
+        }
+
+        // Sayfa yüklendiğinde ve her saniye kontrol et (dinamik tepki için)
+        checkAccess();
+        setInterval(checkAccess, 1000);
+    </script>
+</body>
+</html>
